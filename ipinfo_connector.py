@@ -1,6 +1,6 @@
 # File: ipinfo_connector.py
 #
-# Copyright (c) 2018 Splunk Inc.
+# Copyright (c) 2018-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +15,17 @@
 #
 #
 # Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
+import ipaddress
+import json
+import re
 
+import phantom.app as phantom
 # Usage of the consts file is recommended
 # from ipinfo_consts import *
 import requests
-import json
-import re
 from bs4 import BeautifulSoup
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
 
 
 class RetVal(tuple):
@@ -38,10 +39,35 @@ class IpinfoConnector(BaseConnector):
 
         # Call the BaseConnectors init first
         super(IpinfoConnector, self).__init__()
-
         self._state = None
-
         self._base_url = None
+
+    def _get_error_message_from_exception(self, e):
+        """
+        Get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        error_code = None
+        error_msg = "Error message unavailable"
+
+        try:
+            if hasattr(e, "args"):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_msg = e.args[0]
+        except Exception as e:
+            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
+
+        if not error_code:
+            error_text = "Error Message: {}".format(error_msg)
+        else:
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+
+        return error_text
 
     def _process_empty_reponse(self, response, action_result):
 
@@ -61,7 +87,7 @@ class IpinfoConnector(BaseConnector):
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-        except:  # noqa
+        except Exception:  # noqa
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
@@ -76,7 +102,8 @@ class IpinfoConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err_msg)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -86,7 +113,7 @@ class IpinfoConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+            r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -146,7 +173,8 @@ class IpinfoConnector(BaseConnector):
                             headers=headers,
                             params=params)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            err_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err_msg)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -160,7 +188,7 @@ class IpinfoConnector(BaseConnector):
 
         ret_val = self._handle_lookup_ip(test_param)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed.")
             return phantom.APP_ERROR
 
@@ -178,9 +206,10 @@ class IpinfoConnector(BaseConnector):
         endpoint = ip + '/json'
 
         # make rest call using the IP as the endpoint
+        self.debug_print("Making rest call for lookup_ip")
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         if 'loc' in response:
@@ -219,9 +248,10 @@ class IpinfoConnector(BaseConnector):
         endpoint = asn + '/json'
 
         # make rest call using the IP as the endpoint
+        self.debug_print("Making rest call for lookup_asn")
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -240,7 +270,7 @@ class IpinfoConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -260,11 +290,19 @@ class IpinfoConnector(BaseConnector):
             return False
         return True
 
-    def initialize(self):
+    def _validate_ip(self, ip):
+        try:
+            ipaddress.ip_address(ip)
+        except Exception:
+            return False
 
+        return True
+
+    def initialize(self):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
+        self.set_validator('ip', self._validate_ip)
         self.set_validator('asn', self._validate_asn)
 
         # get the asset config
@@ -284,8 +322,9 @@ class IpinfoConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import pudb
     import argparse
+
+    import pudb
 
     pudb.set_trace()
 
@@ -301,15 +340,15 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get("https://127.0.0.1/login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -322,11 +361,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = 'https://127.0.0.1/login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: {}".format(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -337,11 +376,11 @@ if __name__ == '__main__':
         connector = IpinfoConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
