@@ -10,11 +10,11 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2022 Splunk Inc.",
-    "app_version": "1.1.0",
+    "app_version": "1.2.0",
     "utctime_updated": "2022-01-07T21:03:25.000000Z",
     "package_name": "phantom_ipinfo",
     "main_module": "ipinfo_connector.py",
-    "min_phantom_version": "5.3.0",
+    "min_phantom_version": "5.3.3",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
@@ -612,7 +612,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.6.15.1-py3-none-any.whl"
             },
             {
                 "module": "chardet",

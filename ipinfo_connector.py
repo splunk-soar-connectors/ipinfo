@@ -209,6 +209,9 @@ class IpinfoConnector(BaseConnector):
         self.debug_print("Making rest call for lookup_ip")
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
+        if response.get('bogon'):
+            return action_result.set_status(phantom.APP_ERROR, "Error: The IP address is a bogon IP. No data for this IP address.")
+
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
