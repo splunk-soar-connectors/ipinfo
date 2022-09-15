@@ -18,6 +18,7 @@
 import ipaddress
 import json
 import re
+import traceback
 
 import phantom.app as phantom
 # Usage of the consts file is recommended
@@ -51,6 +52,7 @@ class IpinfoConnector(BaseConnector):
 
         error_code = None
         error_msg = "Error message unavailable"
+        self.error_print("Traceback: {}".format(traceback.format_stack()))
 
         try:
             if hasattr(e, "args"):
@@ -60,7 +62,7 @@ class IpinfoConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
         except Exception as e:
-            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
+            self.error_print("Error occurred while retrieving exception information: ", e)
 
         if not error_code:
             error_text = "Error Message: {}".format(error_msg)
@@ -87,7 +89,7 @@ class IpinfoConnector(BaseConnector):
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-        except Exception:  # noqa
+        except Exception:
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
@@ -326,6 +328,7 @@ class IpinfoConnector(BaseConnector):
 if __name__ == '__main__':
 
     import argparse
+    import sys
 
     import pudb
 
@@ -352,7 +355,8 @@ if __name__ == '__main__':
     if username and password:
         try:
             print("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            login_url = BaseConnector._get_phantom_base_url() + 'login'
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -362,14 +366,14 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: {}".format(e))
-            exit(1)
+            sys.exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
@@ -386,4 +390,4 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)

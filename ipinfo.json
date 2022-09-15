@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2022 Splunk Inc.",
-    "app_version": "1.1.0",
+    "app_version": "2.0.0",
     "utctime_updated": "2022-01-07T21:03:25.000000Z",
     "package_name": "phantom_ipinfo",
     "main_module": "ipinfo_connector.py",
@@ -18,7 +18,7 @@
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
-        "September 14, 2022"
+        "Cloud, September 14, 2022"
     ],
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -80,6 +80,14 @@
                         "8.8.8.8"
                     ],
                     "map_info": "IP Address"
+                },
+                {
+                    "data_path": "action_result.data.*.anycast",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.asn.asn",
@@ -223,6 +231,13 @@
                     "map_info": "longitude"
                 },
                 {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string",
+                    "example_values": [
+                        "AS15169 Google LLC"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.phone",
                     "data_type": "string",
                     "example_values": [
@@ -238,21 +253,6 @@
                     "map_info": "Postal"
                 },
                 {
-                    "data_path": "action_result.data.*.region",
-                    "data_type": "string",
-                    "example_values": [
-                        "California"
-                    ],
-                    "map_info": "Region"
-                },
-                {
-                    "data_path": "action_result.data.*.org",
-                    "data_type": "string",
-                    "example_values": [
-                        "AS15169 Google LLC"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.readme",
                     "data_type": "string",
                     "example_values": [
@@ -260,12 +260,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.anycast",
-                    "data_type": "boolean",
+                    "data_path": "action_result.data.*.region",
+                    "data_type": "string",
                     "example_values": [
-                        true,
-                        false
-                    ]
+                        "California"
+                    ],
+                    "map_info": "Region"
                 },
                 {
                     "data_path": "action_result.data.*.timezone",
@@ -456,6 +456,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.prefixes.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "ccselink.com"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.prefixes.*.id",
                     "data_type": "string",
                     "example_values": [
@@ -477,10 +484,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.prefixes.*.size",
+                    "data_type": "string",
+                    "example_values": [
+                        "256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "REASSIGNMENT"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.prefixes6.*.country",
                     "data_type": "string",
                     "example_values": [
                         "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes6.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "comcast.com"
                     ]
                 },
                 {
@@ -505,6 +533,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.prefixes6.*.size",
+                    "data_type": "string",
+                    "example_values": [
+                        "633825300114114700748351602688"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes6.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ALLOCATION"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.registry",
                     "data_type": "string",
                     "example_values": [
@@ -518,48 +560,6 @@
                     "data_type": "string",
                     "example_values": [
                         "isp"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.prefixes.*.size",
-                    "data_type": "string",
-                    "example_values": [
-                        "256"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.prefixes.*.domain",
-                    "data_type": "string",
-                    "example_values": [
-                        "ccselink.com"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.prefixes.*.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "REASSIGNMENT"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.prefixes6.*.size",
-                    "data_type": "string",
-                    "example_values": [
-                        "633825300114114700748351602688"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.prefixes6.*.domain",
-                    "data_type": "string",
-                    "example_values": [
-                        "comcast.com"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.prefixes6.*.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "ALLOCATION"
                     ]
                 },
                 {
