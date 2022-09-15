@@ -18,7 +18,7 @@
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
-        "June 28, 2022"
+        "September 14, 2022"
     ],
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -612,7 +612,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.6.15.1-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.9.14-py3-none-any.whl"
             },
             {
                 "module": "chardet",
