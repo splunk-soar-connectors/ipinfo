@@ -1,26 +1,30 @@
 {
     "appid": "fd4d574e-541b-4661-82d6-5e01ecfa8332",
-    "name": "ipinfo.io",
+    "name": "IPinfo",
     "description": "Uses ipinfo.io to lookup IP addresses and Autonomous System Numbers",
     "type": "information",
     "product_vendor": "ipinfo.io",
-    "logo": "ipinfo.svg",
-    "logo_dark": "ipinfo_dark.svg",
+    "logo": "logo_ipinfo.svg",
+    "logo_dark": "logo_ipinfo_dark.svg",
     "product_name": "ipinfo.io",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2018",
-    "app_version": "1.0.6",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019-2022 Splunk Inc.",
+    "app_version": "2.0.0",
     "utctime_updated": "2022-01-07T21:03:25.000000Z",
     "package_name": "phantom_ipinfo",
-    "main_module": "ipinfo_connector.pyc",
-    "min_phantom_version": "3.0.284",
+    "main_module": "ipinfo_connector.py",
+    "min_phantom_version": "5.3.3",
+    "python_version": "3",
+    "fips_compliant": true,
+    "latest_tested_versions": [
+        "Cloud, September 14, 2022"
+    ],
     "app_wizard_version": "1.0.0",
     "configuration": {
         "token": {
-            "description": "IPInfo API token",
+            "description": "IPinfo API token",
             "data_type": "password",
-            "required": false,
             "order": 0
         }
     },
@@ -29,7 +33,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -40,7 +43,6 @@
             "action": "lookup ip",
             "identifier": "lookup_ip",
             "description": "Lookup the details of an IP address",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -52,8 +54,6 @@
                     "contains": [
                         "ip"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -61,10 +61,11 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 1,
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -73,12 +74,20 @@
                     "contains": [
                         "ip"
                     ],
-                    "column_name": "ip",
+                    "column_name": "IP",
                     "column_order": 0,
                     "example_values": [
                         "8.8.8.8"
                     ],
                     "map_info": "IP Address"
+                },
+                {
+                    "data_path": "action_result.data.*.anycast",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.asn.asn",
@@ -222,6 +231,13 @@
                     "map_info": "longitude"
                 },
                 {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string",
+                    "example_values": [
+                        "AS15169 Google LLC"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.phone",
                     "data_type": "string",
                     "example_values": [
@@ -237,12 +253,26 @@
                     "map_info": "Postal"
                 },
                 {
+                    "data_path": "action_result.data.*.readme",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://ipinfo.io/missingauth"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.region",
                     "data_type": "string",
                     "example_values": [
                         "California"
                     ],
                     "map_info": "Region"
+                },
+                {
+                    "data_path": "action_result.data.*.timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Los_Angeles"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.carrier_name",
@@ -327,7 +357,6 @@
             "action": "lookup asn",
             "identifier": "lookup_asn",
             "description": "Lookup the details of an Autonomous System Number",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -339,8 +368,6 @@
                     "contains": [
                         "asn"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -349,7 +376,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 1
@@ -428,6 +456,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.prefixes.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "ccselink.com"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.prefixes.*.id",
                     "data_type": "string",
                     "example_values": [
@@ -449,10 +484,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.prefixes.*.size",
+                    "data_type": "string",
+                    "example_values": [
+                        "256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "REASSIGNMENT"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.prefixes6.*.country",
                     "data_type": "string",
                     "example_values": [
                         "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes6.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "comcast.com"
                     ]
                 },
                 {
@@ -477,6 +533,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.prefixes6.*.size",
+                    "data_type": "string",
+                    "example_values": [
+                        "633825300114114700748351602688"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes6.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ALLOCATION"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.registry",
                     "data_type": "string",
                     "example_values": [
@@ -484,6 +554,13 @@
                     ],
                     "column_name": "Registry",
                     "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "isp"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.name",
@@ -530,36 +607,32 @@
     "pip_dependencies": {
         "wheel": [
             {
-                "module": "backports.functools_lru_cache",
-                "input_file": "wheels/backports.functools_lru_cache-1.6.4-py2.py3-none-any.whl"
-            },
-            {
                 "module": "beautifulsoup4",
-                "input_file": "wheels/beautifulsoup4-4.9.1-py2-none-any.whl"
+                "input_file": "wheels/py3/beautifulsoup4-4.11.1-py3-none-any.whl"
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.9.14-py3-none-any.whl"
             },
             {
                 "module": "chardet",
-                "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
             },
             {
                 "module": "idna",
-                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
             },
             {
                 "module": "requests",
-                "input_file": "wheels/requests-2.25.0-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/soupsieve-1.9.6-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
             }
         ]
     }

@@ -1,4 +1,4 @@
-# File: __init__.py
+# File: ipinfo_consts.py
 #
 # Copyright (c) 2019-2022 Splunk Inc.
 #
@@ -12,3 +12,5 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
+IPINFO_DEFAULT_TIMEOUT = 30
+IPINFO_BAD_IP_ERROR = "Error: The IP address is a bogon IP. No data for this IP address."
