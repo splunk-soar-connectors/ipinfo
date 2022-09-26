@@ -2,7 +2,7 @@
 # IPinfo
 
 Publisher: Splunk  
-Connector Version: 2\.0\.0  
+Connector Version: 2\.0\.1  
 Product Vendor: ipinfo\.io  
 Product Name: ipinfo\.io  
 Product Version Supported (regex): "\.\*"  
