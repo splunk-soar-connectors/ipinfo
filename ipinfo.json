@@ -1,5 +1,5 @@
 {
-    "appid": "fd4d574e-541b-4661-82d6-5e01ecfa8332",
+    "appid": "4da0b970-9440-418a-b5b1-f6d2def0ade2",
     "name": "IPinfo",
     "description": "Uses ipinfo.io to lookup IP addresses and Autonomous System Numbers",
     "type": "information",
@@ -612,7 +612,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.9.14-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.9.24-py3-none-any.whl"
             },
             {
                 "module": "chardet",
