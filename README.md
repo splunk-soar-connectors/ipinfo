@@ -2,16 +2,16 @@
 # IPinfo
 
 Publisher: Splunk  
-Connector Version: 2\.0\.1  
-Product Vendor: ipinfo\.io  
-Product Name: ipinfo\.io  
-Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.3\.3  
+Connector Version: 2.0.2  
+Product Vendor: ipinfo.io  
+Product Name: ipinfo.io  
+Product Version Supported (regex): ".\*"  
+Minimum Product Version: 5.3.3  
 
-Uses ipinfo\.io to lookup IP addresses and Autonomous System Numbers
+Uses ipinfo.io to lookup IP addresses and Autonomous System Numbers
 
 ### Configuration Variables
-The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a ipinfo\.io asset in SOAR.
+The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a ipinfo.io asset in SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
@@ -46,44 +46,44 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **ip** |  required  | IP to lookup | string |  `ip` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.ip | string |  `ip` 
-action\_result\.data\.\*\.anycast | boolean | 
-action\_result\.data\.\*\.asn\.asn | string |  `asn` 
-action\_result\.data\.\*\.asn\.domain | string |  `domain` 
-action\_result\.data\.\*\.asn\.name | string | 
-action\_result\.data\.\*\.asn\.route | string | 
-action\_result\.data\.\*\.asn\.type | string | 
-action\_result\.data\.\*\.carrier\.mcc | string | 
-action\_result\.data\.\*\.carrier\.mnc | string | 
-action\_result\.data\.\*\.carrier\.name | string | 
-action\_result\.data\.\*\.city | string | 
-action\_result\.data\.\*\.company\.domain | string |  `domain` 
-action\_result\.data\.\*\.company\.name | string | 
-action\_result\.data\.\*\.company\.type | string | 
-action\_result\.data\.\*\.country | string | 
-action\_result\.data\.\*\.hostname | string |  `host name` 
-action\_result\.data\.\*\.ip | string |  `ip` 
-action\_result\.data\.\*\.loc\.latitude | string | 
-action\_result\.data\.\*\.loc\.longitude | string | 
-action\_result\.data\.\*\.org | string | 
-action\_result\.data\.\*\.phone | string | 
-action\_result\.data\.\*\.postal | string | 
-action\_result\.data\.\*\.readme | string | 
-action\_result\.data\.\*\.region | string | 
-action\_result\.data\.\*\.timezone | string | 
-action\_result\.summary\.carrier\_name | string | 
-action\_result\.summary\.city | string | 
-action\_result\.summary\.company\_domain | string |  `domain` 
-action\_result\.summary\.company\_name | string | 
-action\_result\.summary\.company\_type | string | 
-action\_result\.summary\.country | string | 
-action\_result\.summary\.region | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.ip | string |  `ip`  |   8.8.8.8 
+action_result.data.\*.anycast | boolean |  |   True  False 
+action_result.data.\*.asn.asn | string |  `asn`  |   AS15169 
+action_result.data.\*.asn.domain | string |  `domain`  |   google.com 
+action_result.data.\*.asn.name | string |  |   Google LLC 
+action_result.data.\*.asn.route | string |  |   8.8.8.0/24 
+action_result.data.\*.asn.type | string |  |   hosting 
+action_result.data.\*.carrier.mcc | string |  |   310 
+action_result.data.\*.carrier.mnc | string |  |   150 
+action_result.data.\*.carrier.name | string |  |   AT&T 
+action_result.data.\*.city | string |  |   Mountain View 
+action_result.data.\*.company.domain | string |  `domain`  |   google.com 
+action_result.data.\*.company.name | string |  |   Google LLC 
+action_result.data.\*.company.type | string |  |   hosting 
+action_result.data.\*.country | string |  |   US 
+action_result.data.\*.hostname | string |  `host name`  |   google-public-dns-a.google.com 
+action_result.data.\*.ip | string |  `ip`  |   8.8.8.8 
+action_result.data.\*.loc.latitude | string |  |   37.3860 
+action_result.data.\*.loc.longitude | string |  |   -122.0840 
+action_result.data.\*.org | string |  |   AS15169 Google LLC 
+action_result.data.\*.phone | string |  |   650 
+action_result.data.\*.postal | string |  |   94035 
+action_result.data.\*.readme | string |  |   https://ipinfo.io/missingauth 
+action_result.data.\*.region | string |  |   California 
+action_result.data.\*.timezone | string |  |   America/Los_Angeles 
+action_result.summary.carrier_name | string |  |   AT&T 
+action_result.summary.city | string |  |   Mountain View 
+action_result.summary.company_domain | string |  `domain`  |   google.com 
+action_result.summary.company_name | string |  |   Google LLC 
+action_result.summary.company_type | string |  |   hosting 
+action_result.summary.country | string |  |   US 
+action_result.summary.region | string |  |   California 
+action_result.message | string |  |   Company type: hosting, Company domain: google.com, Company name: Google LLC 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'lookup asn'
 Lookup the details of an Autonomous System Number
@@ -97,34 +97,34 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **asn** |  required  | ASN to lookup | string |  `asn` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.asn | string |  `asn` 
-action\_result\.data\.\*\.allocated | string | 
-action\_result\.data\.\*\.asn | string |  `asn` 
-action\_result\.data\.\*\.country | string | 
-action\_result\.data\.\*\.domain | string |  `domain` 
-action\_result\.data\.\*\.name | string | 
-action\_result\.data\.\*\.num\_ips | numeric | 
-action\_result\.data\.\*\.prefixes\.\*\.country | string | 
-action\_result\.data\.\*\.prefixes\.\*\.domain | string | 
-action\_result\.data\.\*\.prefixes\.\*\.id | string | 
-action\_result\.data\.\*\.prefixes\.\*\.name | string | 
-action\_result\.data\.\*\.prefixes\.\*\.netblock | string | 
-action\_result\.data\.\*\.prefixes\.\*\.size | string | 
-action\_result\.data\.\*\.prefixes\.\*\.status | string | 
-action\_result\.data\.\*\.prefixes6\.\*\.country | string | 
-action\_result\.data\.\*\.prefixes6\.\*\.domain | string | 
-action\_result\.data\.\*\.prefixes6\.\*\.id | string | 
-action\_result\.data\.\*\.prefixes6\.\*\.name | string | 
-action\_result\.data\.\*\.prefixes6\.\*\.netblock | string | 
-action\_result\.data\.\*\.prefixes6\.\*\.size | string | 
-action\_result\.data\.\*\.prefixes6\.\*\.status | string | 
-action\_result\.data\.\*\.registry | string | 
-action\_result\.data\.\*\.type | string | 
-action\_result\.summary\.name | string | 
-action\_result\.summary\.num\_ips | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.asn | string |  `asn`  |   AS7922 
+action_result.data.\*.allocated | string |  |   1997-02-14 
+action_result.data.\*.asn | string |  `asn`  |   AS7922 
+action_result.data.\*.country | string |  |   US 
+action_result.data.\*.domain | string |  `domain`  |   comcast.net 
+action_result.data.\*.name | string |  |   Comcast Cable Communications, LLC 
+action_result.data.\*.num_ips | numeric |  |   71211264 
+action_result.data.\*.prefixes.\*.country | string |  |   US 
+action_result.data.\*.prefixes.\*.domain | string |  |   ccselink.com 
+action_result.data.\*.prefixes.\*.id | string |  |   AKAMAI 
+action_result.data.\*.prefixes.\*.name | string |  |   Akamai Technologies, Inc. 
+action_result.data.\*.prefixes.\*.netblock | string |  |   104.109.53.0/24 
+action_result.data.\*.prefixes.\*.size | string |  |   256 
+action_result.data.\*.prefixes.\*.status | string |  |   REASSIGNMENT 
+action_result.data.\*.prefixes6.\*.country | string |  |   US 
+action_result.data.\*.prefixes6.\*.domain | string |  |   comcast.com 
+action_result.data.\*.prefixes6.\*.id | string |  |   COMCAST6NET 
+action_result.data.\*.prefixes6.\*.name | string |  |   Comcast Cable Communications, LLC 
+action_result.data.\*.prefixes6.\*.netblock | string |  |   2001:558::/29 
+action_result.data.\*.prefixes6.\*.size | string |  |   633825300114114700748351602688 
+action_result.data.\*.prefixes6.\*.status | string |  |   ALLOCATION 
+action_result.data.\*.registry | string |  |   arin 
+action_result.data.\*.type | string |  |   isp 
+action_result.summary.name | string |  |   Comcast Cable Communications, LLC 
+action_result.summary.num_ips | numeric |  |   71211264 
+action_result.message | string |  |   Num ips: 71211264, Name: Comcast Cable Communications, LLC 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 
