@@ -10,12 +10,15 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2025 Splunk Inc.",
-    "app_version": "2.0.3",
-    "utctime_updated": "2025-04-11T18:52:29.831160Z",
+    "app_version": "2.0.4",
+    "utctime_updated": "2025-07-30T17:46:59.299836Z",
     "package_name": "phantom_ipinfo",
     "main_module": "ipinfo_connector.py",
     "min_phantom_version": "5.3.3",
-    "python_version": ["3.9", "3.13"],
+    "python_version": [
+        "3.9",
+        "3.13"
+    ],
     "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud, September 14, 2022"
