@@ -1,7 +1,7 @@
 # IPinfo
 
 Publisher: Splunk \
-Connector Version: 2.0.4 \
+Connector Version: 2.0.5 \
 Product Vendor: ipinfo.io \
 Product Name: ipinfo.io \
 Minimum Product Version: 5.3.3
