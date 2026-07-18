@@ -155,8 +155,9 @@ class IpinfoConnector(BaseConnector):
         if params is None:
             params = {}
 
+        headers = dict(headers or {})
         if self._token is not None:
-            params["token"] = self._token
+            headers["Authorization"] = f"Bearer {self._token}"
 
         # Create a URL to connect to
         url = self._base_url + endpoint
