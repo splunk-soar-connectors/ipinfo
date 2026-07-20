@@ -1,6 +1,6 @@
 # File: ipinfo_connector.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -155,8 +155,9 @@ class IpinfoConnector(BaseConnector):
         if params is None:
             params = {}
 
+        headers = dict(headers or {})
         if self._token is not None:
-            params["token"] = self._token
+            headers["Authorization"] = f"Bearer {self._token}"
 
         # Create a URL to connect to
         url = self._base_url + endpoint

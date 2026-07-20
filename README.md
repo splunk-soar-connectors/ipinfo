@@ -1,9 +1,9 @@
 # IPinfo
 
-Publisher: Splunk \
-Connector Version: 2.0.5 \
-Product Vendor: ipinfo.io \
-Product Name: ipinfo.io \
+Publisher: Splunk <br>
+Connector Version: 2.0.5 <br>
+Product Vendor: ipinfo.io <br>
+Product Name: ipinfo.io <br>
 Minimum Product Version: 5.3.3
 
 Uses ipinfo.io to lookup IP addresses and Autonomous System Numbers
@@ -18,15 +18,15 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration \
-[lookup ip](#action-lookup-ip) - Lookup the details of an IP address \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration <br>
+[lookup ip](#action-lookup-ip) - Lookup the details of an IP address <br>
 [lookup asn](#action-lookup-asn) - Lookup the details of an Autonomous System Number
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity using supplied configuration
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -41,7 +41,7 @@ No Output
 
 Lookup the details of an IP address
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -95,7 +95,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Lookup the details of an Autonomous System Number
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -142,7 +142,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
