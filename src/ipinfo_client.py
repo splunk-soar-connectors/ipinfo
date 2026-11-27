@@ -13,7 +13,7 @@
 # limitations under the License.
 from typing import Any
 
-import httpx
+import httpx2
 from soar_sdk.exceptions import ActionFailure
 
 from .asset import Asset
@@ -31,7 +31,7 @@ def ipinfo_request(
     content: str | None = None,
     timeout: float = IPINFO_DEFAULT_TIMEOUT,
     verify: bool = True,
-) -> httpx.Response:
+) -> httpx2.Response:
     """Send one request to https://ipinfo.io/<endpoint> with the asset's token.
 
     This is the only place that adds the Authorization header, so every action
@@ -43,7 +43,7 @@ def ipinfo_request(
         request_headers["Authorization"] = f"Bearer {asset.token}"
 
     try:
-        return httpx.request(
+        return httpx2.request(
             method,
             IPINFO_BASE_URL + endpoint.lstrip("/"),
             headers=request_headers,
@@ -53,7 +53,7 @@ def ipinfo_request(
             timeout=timeout,
             verify=verify,
         )
-    except httpx.HTTPError as e:
+    except httpx2.HTTPError as e:
         raise ActionFailure(f"Error connecting to ipinfo.io: {e}") from e
 
 

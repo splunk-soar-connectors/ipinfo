@@ -11,13 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Checks the one place that talks to ipinfo.io, with httpx.request replaced by a fake."""
+"""Checks the one place that talks to ipinfo.io, with httpx2.request replaced by a fake."""
 
 from typing import Any
 
 import re
 
-import httpx
+import httpx2
 import pytest
 from soar_sdk.exceptions import ActionFailure
 
@@ -27,20 +27,20 @@ from src.consts import IPINFO_DEFAULT_TIMEOUT
 from .conftest import FAKE_TOKEN, SAMPLE_IP_RESPONSE
 
 
-def _fake_httpx(monkeypatch, response: httpx.Response) -> list[dict[str, Any]]:
-    """Replace httpx.request with a fake that records each call and returns response."""
+def _fake_httpx(monkeypatch, response: httpx2.Response) -> list[dict[str, Any]]:
+    """Replace httpx2.request with a fake that records each call and returns response."""
     calls: list[dict[str, Any]] = []
 
-    def fake_request(method: str, url: str, **kwargs: Any) -> httpx.Response:
+    def fake_request(method: str, url: str, **kwargs: Any) -> httpx2.Response:
         calls.append({"method": method, "url": url, **kwargs})
         return response
 
-    monkeypatch.setattr(ipinfo_client.httpx, "request", fake_request)
+    monkeypatch.setattr(ipinfo_client.httpx2, "request", fake_request)
     return calls
 
 
 def test_request_adds_bearer_token_and_default_timeout(monkeypatch, asset) -> None:
-    calls = _fake_httpx(monkeypatch, httpx.Response(200, json=SAMPLE_IP_RESPONSE))
+    calls = _fake_httpx(monkeypatch, httpx2.Response(200, json=SAMPLE_IP_RESPONSE))
 
     ipinfo_client.ipinfo_request(asset, "GET", "8.8.8.8/json")
 
@@ -53,7 +53,7 @@ def test_request_adds_bearer_token_and_default_timeout(monkeypatch, asset) -> No
 def test_request_without_token_sends_no_authorization_header(
     monkeypatch, asset_without_token
 ) -> None:
-    calls = _fake_httpx(monkeypatch, httpx.Response(200, json=SAMPLE_IP_RESPONSE))
+    calls = _fake_httpx(monkeypatch, httpx2.Response(200, json=SAMPLE_IP_RESPONSE))
 
     ipinfo_client.ipinfo_request(asset_without_token, "GET", "8.8.8.8/json")
 
@@ -61,7 +61,7 @@ def test_request_without_token_sends_no_authorization_header(
 
 
 def test_request_does_not_double_the_slash(monkeypatch, asset) -> None:
-    calls = _fake_httpx(monkeypatch, httpx.Response(200, json=SAMPLE_IP_RESPONSE))
+    calls = _fake_httpx(monkeypatch, httpx2.Response(200, json=SAMPLE_IP_RESPONSE))
 
     ipinfo_client.ipinfo_request(asset, "GET", "/8.8.8.8/json")
 
@@ -69,17 +69,17 @@ def test_request_does_not_double_the_slash(monkeypatch, asset) -> None:
 
 
 def test_connection_error_becomes_action_failure(monkeypatch, asset) -> None:
-    def fake_request(method: str, url: str, **kwargs: Any) -> httpx.Response:
-        raise httpx.ConnectError("connection refused")
+    def fake_request(method: str, url: str, **kwargs: Any) -> httpx2.Response:
+        raise httpx2.ConnectError("connection refused")
 
-    monkeypatch.setattr(ipinfo_client.httpx, "request", fake_request)
+    monkeypatch.setattr(ipinfo_client.httpx2, "request", fake_request)
 
     with pytest.raises(ActionFailure, match=re.escape("Error connecting to ipinfo.io")):
         ipinfo_client.ipinfo_request(asset, "GET", "8.8.8.8/json")
 
 
 def test_get_returns_the_json_body(monkeypatch, asset) -> None:
-    _fake_httpx(monkeypatch, httpx.Response(200, json=SAMPLE_IP_RESPONSE))
+    _fake_httpx(monkeypatch, httpx2.Response(200, json=SAMPLE_IP_RESPONSE))
 
     assert ipinfo_client.ipinfo_get(asset, "8.8.8.8/json") == SAMPLE_IP_RESPONSE
 
@@ -88,7 +88,7 @@ def test_get_raises_on_api_error_without_leaking_the_token(monkeypatch, asset) -
     # ipinfo echoes the token back in some error replies; legacy put it in the error message
     _fake_httpx(
         monkeypatch,
-        httpx.Response(
+        httpx2.Response(
             401,
             json={
                 "error": "Token does not have access to this API",
@@ -106,14 +106,14 @@ def test_get_raises_on_api_error_without_leaking_the_token(monkeypatch, asset) -
 
 
 def test_get_raises_when_error_key_comes_with_200(monkeypatch, asset) -> None:
-    _fake_httpx(monkeypatch, httpx.Response(200, json={"error": "Wrong ip"}))
+    _fake_httpx(monkeypatch, httpx2.Response(200, json={"error": "Wrong ip"}))
 
     with pytest.raises(ActionFailure, match="Wrong ip"):
         ipinfo_client.ipinfo_get(asset, "nope/json")
 
 
 def test_get_raises_on_non_json_reply(monkeypatch, asset) -> None:
-    _fake_httpx(monkeypatch, httpx.Response(502, text="<html>Bad Gateway</html>"))
+    _fake_httpx(monkeypatch, httpx2.Response(502, text="<html>Bad Gateway</html>"))
 
     with pytest.raises(
         ActionFailure,

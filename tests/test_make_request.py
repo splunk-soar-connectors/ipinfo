@@ -17,7 +17,7 @@ import importlib
 import json
 from typing import Any
 
-import httpx
+import httpx2
 import pytest
 from soar_sdk.exceptions import ActionFailure
 
@@ -31,13 +31,13 @@ from .conftest import FAKE_TOKEN
 make_request_module = importlib.import_module("src.actions.make_request")
 
 
-def _fake_ipinfo(monkeypatch, response: httpx.Response) -> list[dict[str, Any]]:
+def _fake_ipinfo(monkeypatch, response: httpx2.Response) -> list[dict[str, Any]]:
     """Make make request get `response` instead of calling ipinfo.io. Returns each call's arguments."""
     calls: list[dict[str, Any]] = []
 
     def fake_ipinfo_request(
         asset: Any, method: str, endpoint: str, **kwargs: Any
-    ) -> httpx.Response:
+    ) -> httpx2.Response:
         calls.append({"method": method, "endpoint": endpoint, **kwargs})
         return response
 
@@ -53,7 +53,7 @@ def _params(**overrides: Any) -> IpinfoMakeRequestParams:
 
 def test_get_with_only_required_fields(monkeypatch, soar, asset) -> None:
     # SOAR sends empty optional fields as None (confirmed on the lab box)
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200, text="Mountain View\n"))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200, text="Mountain View\n"))
 
     output = make_request(_params(), soar, asset)
 
@@ -73,7 +73,7 @@ def test_get_with_only_required_fields(monkeypatch, soar, asset) -> None:
 
 
 def test_endpoint_without_leading_slash_is_fixed(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200, text="Mountain View\n"))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200, text="Mountain View\n"))
 
     make_request(_params(endpoint="8.8.8.8/city"), soar, asset)
 
@@ -87,7 +87,7 @@ def test_full_urls_and_empty_endpoints_are_rejected(
     monkeypatch, soar, asset, endpoint: str
 ) -> None:
     # Only ipinfo.io paths are allowed, so the asset token never goes to another host
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     with pytest.raises(ActionFailure, match="Invalid endpoint"):
         make_request(_params(endpoint=endpoint), soar, asset)
@@ -98,7 +98,7 @@ def test_full_urls_and_empty_endpoints_are_rejected(
 def test_error_status_is_returned_not_raised(monkeypatch, soar, asset) -> None:
     _fake_ipinfo(
         monkeypatch,
-        httpx.Response(401, json={"error": "Token does not have access to this API"}),
+        httpx2.Response(401, json={"error": "Token does not have access to this API"}),
     )
 
     output = make_request(_params(endpoint="/AS15169/json"), soar, asset)
@@ -108,7 +108,7 @@ def test_error_status_is_returned_not_raised(monkeypatch, soar, asset) -> None:
 
 
 def test_custom_headers_are_merged_with_defaults(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     make_request(
         _params(headers='{"Accept": "text/plain", "X-Test": "1"}'), soar, asset
@@ -123,7 +123,7 @@ def test_custom_headers_are_merged_with_defaults(monkeypatch, soar, asset) -> No
 
 @pytest.mark.parametrize("headers", ["not-json", '["a", "b"]'])
 def test_invalid_headers_are_rejected(monkeypatch, soar, asset, headers: str) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     with pytest.raises(ActionFailure, match="Invalid JSON headers"):
         make_request(_params(headers=headers), soar, asset)
@@ -132,7 +132,7 @@ def test_invalid_headers_are_rejected(monkeypatch, soar, asset, headers: str) ->
 
 
 def test_json_query_parameters_are_passed_as_params(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     make_request(
         _params(endpoint="/8.8.8.8", query_parameters='{"fields": "city"}'), soar, asset
@@ -143,7 +143,7 @@ def test_json_query_parameters_are_passed_as_params(monkeypatch, soar, asset) ->
 
 
 def test_query_string_is_appended_to_the_endpoint(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     make_request(
         _params(endpoint="/8.8.8.8", query_parameters="?fields=city"), soar, asset
@@ -156,7 +156,7 @@ def test_query_string_is_appended_to_the_endpoint(monkeypatch, soar, asset) -> N
 def test_non_object_json_query_parameters_are_rejected(
     monkeypatch, soar, asset
 ) -> None:
-    _fake_ipinfo(monkeypatch, httpx.Response(200))
+    _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     with pytest.raises(ActionFailure, match="Invalid query parameters"):
         make_request(_params(query_parameters='["fields"]'), soar, asset)
@@ -165,7 +165,7 @@ def test_non_object_json_query_parameters_are_rejected(
 def test_post_batch_sends_the_json_body(monkeypatch, soar, asset) -> None:
     calls = _fake_ipinfo(
         monkeypatch,
-        httpx.Response(
+        httpx2.Response(
             200, json={"8.8.8.8/city": "Mountain View", "1.1.1.1/country": "AU"}
         ),
     )
@@ -187,7 +187,7 @@ def test_post_batch_sends_the_json_body(monkeypatch, soar, asset) -> None:
 
 
 def test_plain_text_body_is_sent_as_is(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     make_request(
         _params(
@@ -205,7 +205,7 @@ def test_plain_text_body_is_sent_as_is(monkeypatch, soar, asset) -> None:
 
 
 def test_invalid_json_body_is_rejected(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     with pytest.raises(ActionFailure, match="Invalid JSON body"):
         make_request(
@@ -218,7 +218,7 @@ def test_invalid_json_body_is_rejected(monkeypatch, soar, asset) -> None:
 
 
 def test_timeout_and_verify_ssl_are_passed_through(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     make_request(_params(timeout=10, verify_ssl=False), soar, asset)
 
@@ -230,7 +230,7 @@ def test_timeout_and_verify_ssl_are_passed_through(monkeypatch, soar, asset) -> 
 def test_other_methods_are_sent_unchanged(
     monkeypatch, soar, asset, method: str
 ) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     make_request(_params(http_method=method), soar, asset)
 
@@ -241,7 +241,7 @@ def test_token_in_the_reply_is_redacted(monkeypatch, soar, asset) -> None:
     # ipinfo echoes the token in 401 replies and in /me
     _fake_ipinfo(
         monkeypatch,
-        httpx.Response(
+        httpx2.Response(
             401,
             json={
                 "error": "Token does not have access to this API",
@@ -262,7 +262,7 @@ def test_token_in_the_reply_is_redacted(monkeypatch, soar, asset) -> None:
 def test_reply_is_unchanged_without_a_token(
     monkeypatch, soar, asset_without_token
 ) -> None:
-    _fake_ipinfo(monkeypatch, httpx.Response(200, text="Mountain View\n"))
+    _fake_ipinfo(monkeypatch, httpx2.Response(200, text="Mountain View\n"))
 
     output = make_request(_params(), soar, asset_without_token)
 
@@ -270,7 +270,7 @@ def test_reply_is_unchanged_without_a_token(
 
 
 def test_lowercase_content_type_replaces_the_default(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     make_request(
         _params(
@@ -292,7 +292,7 @@ def test_lowercase_content_type_replaces_the_default(monkeypatch, soar, asset) -
 
 
 def test_json_scalar_body_is_sent(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     make_request(
         _params(http_method="POST", endpoint="/batch", body="123"), soar, asset
@@ -303,7 +303,7 @@ def test_json_scalar_body_is_sent(monkeypatch, soar, asset) -> None:
 
 
 def test_non_string_header_values_are_converted(monkeypatch, soar, asset) -> None:
-    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+    calls = _fake_ipinfo(monkeypatch, httpx2.Response(200))
 
     make_request(_params(headers='{"X-Retry": 1, "X-Debug": true}'), soar, asset)
 
