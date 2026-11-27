@@ -152,3 +152,31 @@ def test_output_accepts_missing_fields_stored_as_none() -> None:
     assert reparsed.phone is None
     assert reparsed.readme is None
     assert reparsed.loc is None
+
+
+def test_lookup_ip_keeps_fields_that_are_not_declared(monkeypatch, soar, asset) -> None:
+    # Paid plans return more than the declared outputs (ipinfo docs: privacy,
+    # abuse, domains). Legacy stored the whole reply, so playbooks may use them.
+    _fake_ipinfo(
+        monkeypatch,
+        {
+            **SAMPLE_PAID_IP_RESPONSE,
+            "privacy": {
+                "vpn": True,
+                "proxy": False,
+                "tor": False,
+                "service": "PrivateVPN",
+            },
+            "abuse": {"email": "abuse@example.com"},
+            "asn": {**SAMPLE_PAID_IP_RESPONSE["asn"], "country": "US"},
+        },
+    )
+
+    output = lookup_ip(LookupIpParams(ip="8.8.8.8"), soar, asset)
+    stored = output.model_dump(by_alias=True)
+
+    assert stored["privacy"]["vpn"] is True
+    assert stored["abuse"]["email"] == "abuse@example.com"
+    assert stored["asn"]["country"] == "US"
+    # SOAR stores the dump and the widget reads it back into the model
+    assert LookupIpOutput(**stored).model_dump()["privacy"]["service"] == "PrivateVPN"

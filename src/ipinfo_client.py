@@ -27,7 +27,7 @@ def ipinfo_request(
     *,
     headers: dict[str, str] | None = None,
     params: dict[str, Any] | None = None,
-    json_body: Any = None,  # noqa: ANN401
+    json_body: Any = None,
     content: str | None = None,
     timeout: float = IPINFO_DEFAULT_TIMEOUT,
     verify: bool = True,

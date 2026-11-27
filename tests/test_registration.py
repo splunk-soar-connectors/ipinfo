@@ -54,3 +54,13 @@ def test_asset_token_is_sensitive() -> None:
     token_field = app.asset_cls.model_fields["token"]
 
     assert token_field.json_schema_extra["sensitive"] is True
+
+
+def test_lookup_ip_accepts_ipv4_and_ipv6() -> None:
+    # Legacy registered its own validator that accepted IPv6. Without "ipv6" here,
+    # SOAR rejects addresses like 2001:4860:4860::8888 before the action runs
+    # (app-tests lookup_ip_IPv6_000)
+    action = app.actions_manager.get_action("lookup_ip")
+    ip_param = action.meta.parameters._to_json_schema()["ip"]
+
+    assert ip_param["contains"] == ["ip", "ipv6"]

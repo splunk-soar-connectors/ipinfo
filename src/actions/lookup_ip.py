@@ -21,47 +21,57 @@ from soar_sdk.params import Param, Params
 from ..asset import Asset
 from ..consts import IPINFO_BAD_IP_ERROR
 from ..ipinfo_client import ipinfo_get
+from ..outputs import IpinfoOutput
 
 
 class LookupIpParams(Params):
     ip: str = Param(
-        description="IP to lookup", primary=True, cef_types=["ip"], column_name="IP"
+        description="IP to lookup",
+        primary=True,
+        cef_types=["ip", "ipv6"],
+        column_name="IP",
     )
 
 
-class AsnOutput(ActionOutput):
+class AsnOutput(IpinfoOutput):
     asn: str | None = OutputField(cef_types=["asn"], example_values=["AS15169"])
-    domain: str | None = OutputField(cef_types=["domain"], example_values=["google.com"])
+    domain: str | None = OutputField(
+        cef_types=["domain"], example_values=["google.com"]
+    )
     name: str | None = OutputField(example_values=["Google LLC"])
     route: str | None = OutputField(example_values=["8.8.8.0/24"])
     type: str | None = OutputField(example_values=["hosting"])
 
 
-class CarrierOutput(ActionOutput):
+class CarrierOutput(IpinfoOutput):
     mcc: str | None = OutputField(example_values=["310"])
     mnc: str | None = OutputField(example_values=["150"])
     name: str | None = OutputField(example_values=["AT&T"])
 
 
-class CompanyOutput(ActionOutput):
-    domain: str | None = OutputField(cef_types=["domain"], example_values=["google.com"])
+class CompanyOutput(IpinfoOutput):
+    domain: str | None = OutputField(
+        cef_types=["domain"], example_values=["google.com"]
+    )
     name: str | None = OutputField(example_values=["Google LLC"])
     type: str | None = OutputField(example_values=["hosting"])
 
 
-class LocOutput(ActionOutput):
+class LocOutput(IpinfoOutput):
     latitude: str | None = OutputField(example_values=["37.3860"])
     longitude: str | None = OutputField(example_values=["-122.0840"])
 
 
-class LookupIpOutput(ActionOutput):
+class LookupIpOutput(IpinfoOutput):
     # Field order sets the widget table column order: City, Region, Country, Organization
-    ip: str | None = OutputField(cef_types=["ip"], example_values=["8.8.8.8"])
+    ip: str | None = OutputField(cef_types=["ip", "ipv6"], example_values=["8.8.8.8"])
     hostname: str | None = OutputField(
         cef_types=["host name"], example_values=["google-public-dns-a.google.com"]
     )
     city: str | None = OutputField(example_values=["Mountain View"], column_name="City")
-    region: str | None = OutputField(example_values=["California"], column_name="Region")
+    region: str | None = OutputField(
+        example_values=["California"], column_name="Region"
+    )
     country: str | None = OutputField(example_values=["US"], column_name="Country")
     org: str | None = OutputField(
         example_values=["AS15169 Google LLC"], column_name="Organization"

@@ -14,6 +14,7 @@
 """Checks the make request action, with the ipinfo call replaced by a fake."""
 
 import importlib
+import json
 from typing import Any
 
 import httpx
@@ -22,6 +23,8 @@ from soar_sdk.exceptions import ActionFailure
 
 from src.actions.make_request import IpinfoMakeRequestParams, make_request
 from src.consts import IPINFO_DEFAULT_TIMEOUT
+
+from .conftest import FAKE_TOKEN
 
 # src/actions/__init__.py imports the make_request *function*, which hides the module
 # of the same name, so load the module explicitly (as OneDrive's tests do)
@@ -232,3 +235,77 @@ def test_other_methods_are_sent_unchanged(
     make_request(_params(http_method=method), soar, asset)
 
     assert calls[0]["method"] == method
+
+
+def test_token_in_the_reply_is_redacted(monkeypatch, soar, asset) -> None:
+    # ipinfo echoes the token in 401 replies and in /me
+    _fake_ipinfo(
+        monkeypatch,
+        httpx.Response(
+            401,
+            json={
+                "error": "Token does not have access to this API",
+                "token": FAKE_TOKEN,
+            },
+        ),
+    )
+
+    output = make_request(_params(endpoint="/AS15169/json"), soar, asset)
+
+    assert output.status_code == 401
+    assert FAKE_TOKEN not in output.response_body
+    body = json.loads(output.response_body)
+    assert body["token"] == "***"
+    assert body["error"] == "Token does not have access to this API"
+
+
+def test_reply_is_unchanged_without_a_token(
+    monkeypatch, soar, asset_without_token
+) -> None:
+    _fake_ipinfo(monkeypatch, httpx.Response(200, text="Mountain View\n"))
+
+    output = make_request(_params(), soar, asset_without_token)
+
+    assert output.response_body == "Mountain View\n"
+
+
+def test_lowercase_content_type_replaces_the_default(monkeypatch, soar, asset) -> None:
+    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+
+    make_request(
+        _params(
+            http_method="POST",
+            endpoint="/batch",
+            headers='{"content-type": "text/plain"}',
+            body="8.8.8.8/city",
+        ),
+        soar,
+        asset,
+    )
+
+    assert calls[0]["headers"] == {
+        "Accept": "application/json",
+        "content-type": "text/plain",
+    }
+    assert calls[0]["json_body"] is None
+    assert calls[0]["content"] == "8.8.8.8/city"
+
+
+def test_json_scalar_body_is_sent(monkeypatch, soar, asset) -> None:
+    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+
+    make_request(
+        _params(http_method="POST", endpoint="/batch", body="123"), soar, asset
+    )
+
+    assert calls[0]["json_body"] == 123
+    assert calls[0]["content"] is None
+
+
+def test_non_string_header_values_are_converted(monkeypatch, soar, asset) -> None:
+    calls = _fake_ipinfo(monkeypatch, httpx.Response(200))
+
+    make_request(_params(headers='{"X-Retry": 1, "X-Debug": true}'), soar, asset)
+
+    assert calls[0]["headers"]["X-Retry"] == "1"
+    assert calls[0]["headers"]["X-Debug"] == "True"

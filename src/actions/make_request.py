@@ -65,7 +65,13 @@ def _get_headers(params: IpinfoMakeRequestParams) -> dict[str, str]:
     if not isinstance(parsed_headers, dict):
         raise ActionFailure(f"Invalid JSON headers: {params.headers}")
 
-    headers.update(parsed_headers)
+    # Header names are case-insensitive: a user "content-type" replaces the default
+    user_headers = {str(name): str(value) for name, value in parsed_headers.items()}
+    user_names = {name.lower() for name in user_headers}
+    headers = {
+        name: value for name, value in headers.items() if name.lower() not in user_names
+    }
+    headers.update(user_headers)
     return headers
 
 
@@ -90,18 +96,32 @@ def _get_query_params(
     return endpoint, parsed_params
 
 
-def _get_body(params: IpinfoMakeRequestParams, headers: dict[str, str]) -> Any:  # noqa: ANN401
+def _get_body(
+    params: IpinfoMakeRequestParams, headers: dict[str, str]
+) -> tuple[Any, str | None]:
+    """Return (json_body, content): a parsed JSON body, or the raw text body."""
     if not params.body:
-        return None
+        return None, None
 
-    content_type = headers.get("Content-Type", "").lower()
-    if "json" not in content_type:
-        return params.body
+    content_type = next(
+        (value for name, value in headers.items() if name.lower() == "content-type"),
+        "",
+    )
+    if "json" not in content_type.lower():
+        return None, params.body
 
     try:
-        return json.loads(params.body)
+        return json.loads(params.body), None
     except (json.JSONDecodeError, TypeError) as e:
         raise ActionFailure(f"Invalid JSON body: {params.body}") from e
+
+
+def _redact_token(text: str, asset: Asset) -> str:
+    # ipinfo echoes the token in some replies (e.g. 401 errors and /me),
+    # so never return it in the action result
+    if asset.token:
+        return text.replace(asset.token, "***")
+    return text
 
 
 def make_request(
@@ -113,7 +133,7 @@ def make_request(
     endpoint = _get_endpoint(params.endpoint)
     headers = _get_headers(params)
     endpoint, query_params = _get_query_params(params, endpoint)
-    body = _get_body(params, headers)
+    json_body, content = _get_body(params, headers)
     timeout = params.timeout or IPINFO_DEFAULT_TIMEOUT
 
     # HTTP error statuses are returned, not raised, so the caller can inspect them
@@ -123,13 +143,13 @@ def make_request(
         endpoint,
         headers=headers,
         params=query_params,
-        json_body=body if isinstance(body, dict | list) else None,
-        content=body if isinstance(body, str) else None,
+        json_body=json_body,
+        content=content,
         timeout=timeout,
         verify=params.verify_ssl,
     )
 
     return MakeRequestOutput(
         status_code=response.status_code,
-        response_body=response.text,
+        response_body=_redact_token(response.text, asset),
     )

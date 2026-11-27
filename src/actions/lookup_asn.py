@@ -20,6 +20,7 @@ from soar_sdk.params import Param, Params
 
 from ..asset import Asset
 from ..ipinfo_client import ipinfo_get
+from ..outputs import IpinfoOutput
 
 
 class LookupAsnParams(Params):
@@ -28,7 +29,7 @@ class LookupAsnParams(Params):
     )
 
 
-class PrefixesOutput(ActionOutput):
+class PrefixesOutput(IpinfoOutput):
     country: str | None = OutputField(example_values=["US"])
     domain: str | None = OutputField(example_values=["ccselink.com"])
     id: str | None = OutputField(example_values=["AKAMAI"])
@@ -38,7 +39,7 @@ class PrefixesOutput(ActionOutput):
     status: str | None = OutputField(example_values=["REASSIGNMENT"])
 
 
-class Prefixes6Output(ActionOutput):
+class Prefixes6Output(IpinfoOutput):
     country: str | None = OutputField(example_values=["US"])
     domain: str | None = OutputField(example_values=["comcast.com"])
     id: str | None = OutputField(example_values=["COMCAST6NET"])
@@ -48,7 +49,7 @@ class Prefixes6Output(ActionOutput):
     status: str | None = OutputField(example_values=["ALLOCATION"])
 
 
-class LookupAsnOutput(ActionOutput):
+class LookupAsnOutput(IpinfoOutput):
     # Field order sets the widget table column order, matching legacy:
     # ASN, Name, Domain, Registry, Country
     asn: str | None = OutputField(cef_types=["asn"], example_values=["AS7922"])

@@ -111,3 +111,17 @@ def test_output_accepts_missing_fields_stored_as_none() -> None:
 
     assert reparsed.name is None
     assert reparsed.prefixes is None
+
+
+def test_lookup_asn_keeps_fields_that_are_not_declared(
+    monkeypatch, soar, asset
+) -> None:
+    _fake_ipinfo(
+        monkeypatch,
+        {**SAMPLE_ASN_RESPONSE, "peers": ["AS1"], "upstreams": ["AS2"]},
+    )
+
+    output = lookup_asn(LookupAsnParams(asn="AS15169"), soar, asset)
+
+    assert output.model_dump()["peers"] == ["AS1"]
+    assert output.model_dump()["upstreams"] == ["AS2"]
