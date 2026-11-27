@@ -78,9 +78,7 @@
               <td class="widget-td">{{ r.region or "" }}</td>
               <td class="widget-td">{{ r.country or "" }}</td>
               <td class="widget-td">{{ r.org or "" }}</td>
-              <td class="widget-td">
-                {% if r.has_location %}{{ r.latitude }}, {{ r.longitude }}{% endif %}
-              </td>
+              <td class="widget-td">{% if r.has_location %}{{ r.latitude }}, {{ r.longitude }}{% endif %}</td>
             </tr>
           {% endfor %}
         </tbody>
